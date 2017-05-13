@@ -1,0 +1,42 @@
+.container {
+    max-width: 730px;
+}
+
+.jumbotron {
+  text-align: left;
+  margin-bottom: 15px;
+  background: #dcdee2
+}
+
+.progress {
+  background: #dcdee2
+}
+
+#main {
+  padding: 15px
+}
+
+#text {
+	resize: vertical;
+}
+
+.jumbotron .btn {
+  padding: 5px 22px;
+  font-size: 18px;
+}
+
+#predictions {
+  text-align: center
+}
+
+.md-html {
+  max-width: 730px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #eee;
+  padding: 20px;
+}
+
+#nav {
+  margin-top: 12.5px;
+}

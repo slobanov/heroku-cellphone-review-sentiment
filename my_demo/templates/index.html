@@ -1,0 +1,101 @@
+<!doctype html>
+<title>Анализ тональности отзывов</title>
+
+<head>
+    <link rel="icon" href="{{ url_for('static',filename='picks/favicon.png') }}" sizes="32x32">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="{{ url_for('static',filename='styles/align.css') }}" rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+<div class="container">
+    <div class="header clearfix">
+        <nav id="nav">
+            <ul class="nav nav-pills pull-right" style="margin-top: 25px;">
+                <li role="presentation" class="active"><a href="{{ url_for('index') }}">Главная</a></li>
+                <li role="presentation"><a href="{{ url_for('about') }}">Помощь</a></li>
+            </ul>
+        </nav>
+        <h3 class="text-muted">Анализ тональности отзывов</h3>
+        <p>на мобильные телефоны</p>
+    </div>
+
+    <div class="jumbotron" id="main">
+        <div class="form-group">
+            <label>Отзыв:</label>
+            <textarea class="form-control" rows="5" id="text"></textarea>
+        </div>
+        <button class="btn btn-primary" type="button" onclick="callApi()">Оценить</button>
+    </div>
+
+    <div class="progress">
+        <div
+                class="progress-bar"
+                id = "rating"
+                role="progressbar"
+                aria-valuenow="0"
+                aria-valuemin="0"
+                aria-valuemax="100"
+        >
+            <span class="sr-only"></span>
+        </div>
+    </div>
+
+</div>
+
+
+
+<script>
+
+var progress_bar_colors = [
+  "#c90000",
+  "#e89f33",
+  "#e5df30",
+  "#bee530",
+  "#8fdb32",
+  "#00b229"
+]
+var rating_divider = 100./progress_bar_colors.length
+
+function callApi() {
+    var text = document.getElementById('text').value
+    doPredictions(text);
+}
+
+function doPredictions(text) {
+    var xhr = new XMLHttpRequest();
+    var text_param = "text=" + encodeURIComponent(text)
+    xhr.open("GET", "/api/predict?" + text_param, true);
+    xhr.onload = function(e) {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          var prediction = JSON.parse(xhr.responseText)
+
+          document.getElementById("main").style.backgroundColor =
+            prediction["label"] == 0 ? "#ffd6d6" : "#d6ffe0"
+
+          rating = 100 * (prediction["label"] == 0 ?
+            1-prediction["prob"] : prediction["prob"])
+
+          document.getElementById("rating").style.width=rating.toString()+"%"
+          document.getElementById("rating").style.backgroundColor =
+            progress_bar_colors[
+              Math.min(
+                Math.floor(rating/rating_divider),
+                progress_bar_colors.length-1
+              )
+            ]
+
+        } else {
+          console.error(xhr.statusText);
+        }
+      }
+    };
+    xhr.onerror = function(e) {
+      console.error(xhr.statusText);
+    };
+    xhr.send(null);
+}
+</script>
