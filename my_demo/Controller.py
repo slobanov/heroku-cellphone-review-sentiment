@@ -1,11 +1,13 @@
 import json
+import os
 
 from flask import Flask, render_template, request, abort
 
-import SentimentAnalyzer
+from SentimentAnalyzer import SentimentAnalyzer
+from SentimentAnalyzer import stemmed_words
 
 app = Flask("SentimentAnalyzerController")
-analyzer = SentimentAnalyzer
+analyzer = SentimentAnalyzer()
 
 
 @app.route("/", methods=["GET"])
@@ -27,8 +29,10 @@ def predict():
     text = request.args.get("text")
 
     predictions = analyzer.predict(text)
+
     return json.dumps(predictions)
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=9080)
+    port = int(os.getenv("PORT", "9080"))
+    app.run(host='0.0.0.0', port=port)
